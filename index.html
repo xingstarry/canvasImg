@@ -25,87 +25,140 @@
             align-items: center;
             justify-content: center;
         }
-        #canvasBox{
+        .canvasCon{
             border: 1px solid #eee;
             border-radius: .3rem;
             box-shadow: 0 .2rem 1rem rgba(0,0,0,.2);
+            width: 15rem;
+            height: 24rem;
+        }
+        #canvasBox{
+            border-radius: .3rem;
+            background-color: #fff;
+            /* display: none; */
+        }
+        #fullImg{
+            border-radius: .3rem;
+            width: 100%;
+            height: 100%;
         }
         #imgBg,#output{
             display: none;
         }
+
+        .shareBtn{
+            position: fixed;
+            top:0;
+            left: 0;
+            width: 10rem;
+            height: 2rem;
+        }
     </style>
 </head>
 <body>
-    <div class="canvasAll">
-        <canvas id="canvasBox" width="300" height="480">
-            <span>你的版本不支持canvas，请升级</span>
-        </canvas>
+    <div class="canvasAll">       
+        <div id="canvasCon" class="canvasCon"> 
+            <canvas id="canvasBox" >
+                <span>你的版本不支持canvas，请升级</span>
+            </canvas> 
+            <img id="imgShow" src="" alt="">
+        </div>
     </div>
     <div>
         <img id="imgBg" src="imgBg.jpg" alt="">
     </div>
     <div id="output"></div>
+    <button class="shareBtn" onclick="shareBtn()">分享</button>
 </body>
 <script src="jquery.js"></script>
 <script src="jquery.qrcode.min.js"></script>
+<script src="canvas2image.js"></script>
 <script>
     $(function(){
         draw();
-        // canvas2Img();
-        console.log(canvas2Img());
     })    
 
+    function shareBtn(){
+        console.log(2223)
+        canvas2Img(); 
+    }
+
     //canvas绘图
-    function draw(){
-        var imgBg2 = document.getElementById('imgBg'); 
+    function draw(){ 
 
         $('#output').qrcode("http://www.baidu.com");      
-        var strDataURI=$('#output canvas')[0].toDataURL("image/png"); 
-        var qrImg = new Image();
-        qrImg.src = strDataURI;               
+        var strDataURI=$('#output canvas')[0].toDataURL("image/png");            
 
+        var canvasCon = $('.canvasCon');
+        var H = canvasCon.height();
+        var W = canvasCon.width();
         var canvas = document.getElementById("canvasBox");
+        canvas.height = H*2;
+        canvas.width = W*2;
         var ctx = canvas.getContext("2d");
-        var h = $(canvas).height();//百分1的高
-        var w = $(canvas).width();//百分1的宽
-        
+        // var h = $(canvas).height();//百分1的高
+        // var w = $(canvas).width();//百分1的宽
+        ctx.fillStyle="#fff";
+        ctx.fillRect(0,0,W,H);
+
         ctx.beginPath();
         ctx.font="1.2rem Arial";
         ctx.fillStyle = "#4a4a4a"; 
         ctx.textAlign='center';
         ctx.fillText("小 饼 乱 语",150,54);
 
-        ctx.beginPath();
-        ctx.font="0.75rem YaHei";
-        ctx.fillStyle = "#727272"; 
-        ctx.textAlign='center';
-        ctx.fillText('"要有点耐心"',150,280);
+        var imgBg = new Image();
+        imgBg.src = "imgBg.jpg";
+        imgBg.crossOrigin="anonymous";
+        imgBgH = (W-60)*2 /3;
+        imgBg.onload = function(){
+            ctx.drawImage(imgBg, 30, 80, W-60, imgBgH)             
+    
+            ctx.beginPath();
+            ctx.font="0.75rem YaHei";
+            ctx.fillStyle = "#727272"; 
+            ctx.textAlign='center';
+            ctx.fillText('"要有点耐心"',150,280);
 
-        ctx.beginPath();
-        ctx.font="0.65rem YaHei";
-        ctx.fillStyle = "#aaa9af"; 
-        ctx.textAlign='center';
-        ctx.fillText('戊戍年 壬戍月 己丑日',150,340);
+            ctx.beginPath();
+            ctx.font="0.65rem YaHei";
+            ctx.fillStyle = "#aaa9af"; 
+            ctx.textAlign='center';
+            ctx.fillText('戊戍年 壬戍月 己丑日',150,340);
 
-        ctx.beginPath();
-        ctx.font="0.65rem YaHei";
-        ctx.fillStyle = "#aaa9af"; 
-        ctx.textAlign='center';
-        ctx.fillText('今日签语',150,370);
-
+            ctx.beginPath();
+            ctx.font="0.65rem YaHei";
+            ctx.fillStyle = "#aaa9af"; 
+            ctx.textAlign='center';
+            ctx.fillText('今日签语',150,370); 
+            
+            var qrImg = new Image();
+            qrImg.crossOrigin="anonymous";
+            qrImg.src = strDataURI; 
+            qrImg.onload = function(){
+                ctx.drawImage(qrImg, 120, 390, 60, 60)  
+                var _imgSrc = canvas.toDataURL("image/png",1);
+                canvas.style.display="none";
+                var imgShow = document.getElementById('imgShow');
+                imgShow.setAttribute('src', _imgSrc);
+            }  
+        }    
         
-        ctx.beginPath();
-        window.onload = function(){
-            ctx.drawImage(imgBg2, 30, 80, 240, 160)
-            ctx.drawImage(qrImg, 120, 390, 60, 60)            
-        }
     }
 
     function canvas2Img(){
-        var canvasBoxURI=$('#canvasBox')[0].toDataURL("image/png"); 
-        var canvasBoxImg = new Image();
-        canvasBoxImg.src = canvasBoxURI;  
-        return canvasBoxImg;
+        // var canvasBoxURI=$('#canvasBox')[0].toDataURL("image/jpeg"); 
+        // var canvasBoxImg = document.getElementById('fullImg');
+        // canvasBoxImg.src = canvasBoxURI;  
+        var canvasBox = document.getElementById('canvasBox');
+        console.log(canvasBox)
+        var img = Canvas2Image.convertToJPEG(canvasBox, canvasBox.width*2, canvasBox.height*2);
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.borderRadius = ".3rem";
+        var canvasCon = document.getElementById('canvasCon');
+        canvasCon.appendChild(img)
+        // $('.canvasCon').append($(img))
     }
 
     function saveImg(){
