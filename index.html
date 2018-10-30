@@ -35,7 +35,7 @@
         #canvasBox{
             border-radius: .3rem;
             background-color: #fff;
-            /* display: none; */
+            display: none;
         }
         #imgShow{
             display: none;
@@ -69,7 +69,7 @@
         <img id="imgBg" src="imgBg.jpg" alt="">
     </div>
     <div id="output"></div>
-    <button class="shareBtn" onclick="shareBtn()">分享</button>
+    <button class="shareBtn" onclick="saveBtn()">保存</button>
 </body>
 <script src="jquery.js"></script>
 <script src="jquery.qrcode.min.js"></script>
@@ -79,9 +79,14 @@
         draw();
     })    
 
-    function shareBtn(){
+    function saveBtn(){
         console.log(2223)
-        canvas2Img(); 
+        var canvas = document.getElementById("canvasBox");
+        var type = 'img/jpeg'; //图片类型
+        var w = $('#canvasBox').width(); //图片宽度
+        var h = $('#canvasBox').height(); //图片高度
+//        Canvas2Image.saveAsImage(canvas, w, h, type);
+        Canvas2Image.saveAsPNG(canvas, w, h)
     }
 
     //canvas绘图
